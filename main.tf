@@ -43,14 +43,8 @@ provider "aws" {
   }
 }
 
-resource "aws_iam_role" "hello" {
-  path               = "/lambda/"
-  name               = "${local.prefix}${var.lambda_name}"
-  assume_role_policy = data.aws_iam_policy_document.lambda_default.json
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  ]
-}
+
+###
 
 resource "aws_cloudwatch_log_group" "hello" {
   name              = "/aws/lambda/${aws_lambda_function.hello.function_name}"
@@ -105,6 +99,15 @@ resource "aws_lambda_permission" "hello" {
   source_arn    = "${aws_api_gateway_rest_api.default.execution_arn}/*/*"
 }
 
+resource "aws_iam_role" "hello" {
+  path               = "/lambda/"
+  name               = "${local.prefix}${var.lambda_name}"
+  assume_role_policy = data.aws_iam_policy_document.lambda_default.json
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  ]
+}
+
 ####
 
 data "template_file" "api" {
@@ -120,6 +123,11 @@ data "template_file" "api" {
 resource "aws_api_gateway_rest_api" "default" {
   body = data.template_file.api.rendered
   name = "${local.prefix}apigw1"
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+    # validatorとかをいじってる時は"REGIONAL"のほうがいいような気がする。根拠はない
+  }
 }
 
 resource "aws_api_gateway_deployment" "default" {
@@ -138,12 +146,12 @@ resource "aws_api_gateway_deployment" "default" {
 output "endpoint" {
   value = aws_api_gateway_deployment.default.invoke_url
 }
-output api {
+output "api" {
   value = aws_api_gateway_rest_api.default.id
 }
-output region {
+output "region" {
   value = var.aws_region
 }
-output stage {
+output "stage" {
   value = var.stage_name
 }

@@ -1,10 +1,63 @@
 openapi: 3.0.1
 info:
   title: apigw-ex4-apigw1
-  version: '2022-06-30T09:13:29Z'
+  version: '2022-07-01T05:23:29Z'
 servers:
   - url: /${stage_name}
 paths:
+  /hello:
+    get:
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/res1'
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        httpMethod: POST        # typeが'aws*'のときは必ずPOST
+        uri: arn:aws:apigateway:${aws_region_name}:lambda:path/2015-03-31/functions/${hello_function_arn}/invocations
+        passthroughBehavior: when_no_match
+        # timeoutInMillis: 29000 # default. lambdaのtimeoutとは別物
+
+  /hello/{name}:
+    get:
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/res1'
+      x-amazon-apigateway-integration:
+        httpMethod: POST
+        uri: arn:aws:apigateway:${aws_region_name}:lambda:path/2015-03-31/functions/${hello_function_arn}/invocations
+        passthroughBehavior: when_no_match
+        # timeoutInMillis: 29000 # default
+        type: aws_proxy
+
+  /goodbye:
+    get:
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/res1'
+      x-amazon-apigateway-integration:
+        httpMethod: POST
+        uri: arn:aws:apigateway:${aws_region_name}:lambda:path/2015-03-31/functions/${hello_function_arn}/invocations
+        passthroughBehavior: when_no_match
+        # timeoutInMillis: 29000 # default
+        type: aws_proxy
   /add:
     get:
       parameters:
@@ -12,12 +65,13 @@ paths:
           in: query
           required: true
           schema:
-            type: string
+            type: number
+            # numberにしてもstringと同じ。存在チェックしかしてくれない
         - name: b
           in: query
           required: true
           schema:
-            type: string
+            type: number
       responses:
         '200':
           description: 200 response
@@ -30,7 +84,7 @@ paths:
         httpMethod: POST
         uri: arn:aws:apigateway:${aws_region_name}:lambda:path/2015-03-31/functions/${hello_function_arn}/invocations
         passthroughBehavior: when_no_match
-        timeoutInMillis: 29000
+        # timeoutInMillis: 29000 # default.
         type: aws_proxy
     post:
       requestBody:
@@ -51,62 +105,13 @@ paths:
         httpMethod: POST
         uri: arn:aws:apigateway:${aws_region_name}:lambda:path/2015-03-31/functions/${hello_function_arn}/invocations
         passthroughBehavior: when_no_match
-        timeoutInMillis: 29000
+        # timeoutInMillis: 29000 # default
         type: aws_proxy
-  /hello/{name}:
-    get:
-      parameters:
-        - name: name
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 200 response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/res1'
-      x-amazon-apigateway-integration:
-        httpMethod: POST
-        uri: arn:aws:apigateway:${aws_region_name}:lambda:path/2015-03-31/functions/${hello_function_arn}/invocations
-        passthroughBehavior: when_no_match
-        timeoutInMillis: 29000
-        type: aws_proxy
-  /goodbye:
-    get:
-      responses:
-        '200':
-          description: 200 response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/res1'
-      x-amazon-apigateway-integration:
-        httpMethod: POST
-        uri: arn:aws:apigateway:${aws_region_name}:lambda:path/2015-03-31/functions/${hello_function_arn}/invocations
-        passthroughBehavior: when_no_match
-        timeoutInMillis: 29000
-        type: aws_proxy
-  /hello:
-    get:
-      responses:
-        '200':
-          description: 200 response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/res1'
-      x-amazon-apigateway-integration:
-        httpMethod: POST
-        uri: arn:aws:apigateway:${aws_region_name}:lambda:path/2015-03-31/functions/${hello_function_arn}/invocations
-        passthroughBehavior: when_no_match
-        timeoutInMillis: 29000
-        type: aws_proxy
+
 components:
   schemas:
     ab:
+      description: 'something like {"a":1,"b":2}'
       required:
         - a
         - b
