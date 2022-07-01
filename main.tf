@@ -19,8 +19,10 @@ variable "python" {
 variable "log_retention_in_days" {
   default = 7
 }
+
 locals {
   prefix = var.prefix # just as macro
+  layer_name = "PowerTools"
 }
 
 terraform {
@@ -44,12 +46,37 @@ provider "aws" {
 }
 
 
-###
+## layer powertools
 
-resource "aws_cloudwatch_log_group" "hello" {
-  name              = "/aws/lambda/${aws_lambda_function.hello.function_name}"
-  retention_in_days = var.log_retention_in_days
+resource "null_resource" "powertools" {
+  provisioner "local-exec" {
+    command = "${var.python} -m pip install -U -r ./src/${local.layer_name}/requirements.txt -t ./src/${local.layer_name}/python"
+    # 最後の"/python"がコツ。
+  }
+  triggers = {
+    dependencies_versions = filemd5("./src/${local.layer_name}/requirements.txt")
+    # source_versions       = filemd5("./src/${local.layer_name}/app.py")
+  }
+  # 個々のモジュールの更新までは検知できない。更新する時は terraform taint null_resource.powertools で
 }
+
+data "archive_file" "powertools" {
+  depends_on  = [null_resource.powertools]
+  excludes    = ["__pycache__", "venv"]
+  type        = "zip"
+  source_dir  = "./src/${local.layer_name}"
+  output_path = "./tmp/${local.layer_name}.zip"
+}
+
+resource "aws_lambda_layer_version" "powertools" {
+  filename         = data.archive_file.powertools.output_path
+  source_code_hash = data.archive_file.powertools.output_base64sha256
+
+  layer_name = local.layer_name
+  compatible_runtimes = [var.python]
+}
+
+### lambda "hello"
 
 resource "null_resource" "hello" {
   provisioner "local-exec" {
@@ -78,6 +105,16 @@ resource "aws_lambda_function" "hello" {
   handler = "app.lambda_handler"
   runtime = var.python
   role    = aws_iam_role.hello.arn
+
+  layers = [
+    #"arn:aws:lambda:ap-northeast-3:017000801446:layer:AWSLambdaPowertoolsPython:11"
+    aws_lambda_layer_version.powertools.arn
+  ]
+}
+
+resource "aws_cloudwatch_log_group" "hello" {
+  name              = "/aws/lambda/${aws_lambda_function.hello.function_name}"
+  retention_in_days = var.log_retention_in_days
 }
 
 data "aws_iam_policy_document" "lambda_default" {
