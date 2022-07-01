@@ -1,0 +1,139 @@
+openapi: 3.0.1
+info:
+  title: apigw-ex4-apigw1
+  version: '2022-06-30T09:13:29Z'
+servers:
+  - url: /${stage_name}
+paths:
+  /add:
+    get:
+      parameters:
+        - name: a
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: b
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/res2'
+      x-amazon-apigateway-request-validator: validate query only
+      x-amazon-apigateway-integration:
+        httpMethod: POST
+        uri: arn:aws:apigateway:${aws_region_name}:lambda:path/2015-03-31/functions/${hello_function_arn}/invocations
+        passthroughBehavior: when_no_match
+        timeoutInMillis: 29000
+        type: aws_proxy
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ab'
+        required: true
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/res2'
+      x-amazon-apigateway-request-validator: validate body only
+      x-amazon-apigateway-integration:
+        httpMethod: POST
+        uri: arn:aws:apigateway:${aws_region_name}:lambda:path/2015-03-31/functions/${hello_function_arn}/invocations
+        passthroughBehavior: when_no_match
+        timeoutInMillis: 29000
+        type: aws_proxy
+  /hello/{name}:
+    get:
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/res1'
+      x-amazon-apigateway-integration:
+        httpMethod: POST
+        uri: arn:aws:apigateway:${aws_region_name}:lambda:path/2015-03-31/functions/${hello_function_arn}/invocations
+        passthroughBehavior: when_no_match
+        timeoutInMillis: 29000
+        type: aws_proxy
+  /goodbye:
+    get:
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/res1'
+      x-amazon-apigateway-integration:
+        httpMethod: POST
+        uri: arn:aws:apigateway:${aws_region_name}:lambda:path/2015-03-31/functions/${hello_function_arn}/invocations
+        passthroughBehavior: when_no_match
+        timeoutInMillis: 29000
+        type: aws_proxy
+  /hello:
+    get:
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/res1'
+      x-amazon-apigateway-integration:
+        httpMethod: POST
+        uri: arn:aws:apigateway:${aws_region_name}:lambda:path/2015-03-31/functions/${hello_function_arn}/invocations
+        passthroughBehavior: when_no_match
+        timeoutInMillis: 29000
+        type: aws_proxy
+components:
+  schemas:
+    ab:
+      required:
+        - a
+        - b
+      type: object
+      properties:
+        a:
+          type: number
+        b:
+          type: number
+    res1:
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: hi
+    res2:
+      required:
+        - result
+      properties:
+        result:
+          type: number
+          example: 42
+x-amazon-apigateway-request-validators:
+  validate query only:
+    validateRequestParameters: true
+    validateRequestBody: false
+  validate body only:
+    validateRequestParameters: false
+    validateRequestBody: true
