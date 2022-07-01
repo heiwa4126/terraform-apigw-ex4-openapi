@@ -56,3 +56,5 @@ OpenAPI、レスポンスも書いてありますが、ちゃんとチェック�
 exportしたoas3.yamlを
 [Swagger Editor](https://editor.swagger.io/)
 で開けばいいはずなのであとでやる。
+
+やってみたら URLで//devになる問題が。これAWSのAPIのほうが間違ってるような気がする。

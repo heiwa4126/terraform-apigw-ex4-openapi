@@ -1,9 +1,9 @@
 openapi: 3.0.1
 info:
   title: apigw-ex4-apigw1
-  version: '2022-07-01T05:23:29Z'
+  version: '2022-07-01T07:59:58Z'
 servers:
-  - url: /${stage_name}
+  - url: ${stage_name}
 paths:
   /hello:
     get:
