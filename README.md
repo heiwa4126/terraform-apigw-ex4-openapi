@@ -1,4 +1,4 @@
-# terraform-apigw-ex2-openapi
+# terraform-apigw-ex4-openapi
 
 TerraformでAWS Lambda (Python) & API Gateway (powered by OpenAPI) のサンプル。
 
@@ -15,6 +15,8 @@ requirements.txtをサポートする。
 - Python 3.9と3.9のpip (バージョンはvariableで変更可能)
 - Python 3.9が `$ python3.9` で実行できること。
 
+あとAWSアカウントは、環境変数やdefaultとして設定されてるものをそのまま使います。
+
 
 # デプロイ
 
@@ -25,4 +27,32 @@ terraform init
 terraform apply
 ```
 
-outputに `hello_url` が出るので、これをcurlなりブラウザなりで呼ぶ。
+# テスト実行
+
+```bash
+./make_env.sh
+```
+で outputを環境変数にした `tmp/env.sh` ができるので、
+
+- `./remote_test.sh` で正常系のテスト
+- `./validator_test.sh` でバリデータのテスト
+
+
+# OpenAPIのエクスポート
+
+デプロイ後
+
+```bash
+./make_env.sh
+./export_as_openapi.sh
+```
+
+で tmpの下に `oas3.json` と `oas3.yaml`(yqコマンドがあれば)ができます。
+
+
+# ほかメモ
+
+OpenAPI、レスポンスも書いてありますが、ちゃんとチェックしてない。
+exportしたoas3.yamlを
+[Swagger Editor](https://editor.swagger.io/)
+で開けばいいはずなのであとでやる。

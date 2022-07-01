@@ -61,6 +61,12 @@ paths:
   /add:
     get:
       parameters:
+        # ヘッダのサンプル。ヘッダはクエリ扱いらしい
+        # - name: x-tekito
+        #   in: header
+        #   required: true
+        #   schema:
+        #     type: string
         - name: a
           in: query
           required: true
