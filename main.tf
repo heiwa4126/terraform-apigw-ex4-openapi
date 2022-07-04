@@ -148,7 +148,7 @@ resource "aws_iam_role" "hello" {
 ####
 
 data "template_file" "api" {
-  template = file("./hello_api.yml")
+  template = file("./openapi.yaml")
   vars = {
     title              = "${local.prefix}apigw1"
     aws_region_name    = var.aws_region

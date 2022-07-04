@@ -72,12 +72,14 @@ paths:
           required: true
           schema:
             type: number
-            # numberにしてもstringと同じ。存在チェックしかしてくれない
+            format: float
+            # numberにしてもAPIGWではstringと同じ。存在チェックしかしてくれない
         - name: b
           in: query
           required: true
           schema:
             type: number
+            format: float
       responses:
         '200':
           description: 200 response
