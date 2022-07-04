@@ -50,7 +50,7 @@ terraform apply
 で tmpの下に `oas3.json` と `oas3.yaml`(yqコマンドがあれば)ができます。
 
 
-# ほかメモ
+# メモ
 
 OpenAPI、レスポンスも書いてありますが、ちゃんとチェックしてない。
 exportしたoas3.yamlを
@@ -89,8 +89,12 @@ cd out/python
 python3 setup.py install --user
 ```
 
-で準備完了。`README.md` にサンプルコードがあるので、それをコピペして実行。
-更に改造するには `docs/DefaultApi.md` を見る。
+で準備完了。
+`README.md` 中にサンプルコードがあるので、
+それを `test1.py` など適当な名前でコピペして
+`python3 test1.py` を実行。
+
+更に改造するには `docs/DefaultApi.md` を読む。
 
 
 # スタブサーバを作る
@@ -153,10 +157,12 @@ curl localhost:8080/dev/goodbye
 あとは
 `openapi_server/controllers/default_controller.py` の `do some magic!`を修正して本物のスタブサーバーにする。
 
-そこそこできたらDockerにしてメンバに配布する。
+そこそこできたらDockerにしてメンバに配布するといいかも。
 
 とりあえず動かしたけど、なんだか不安。Flaskの1系ってもうメンテされてないのでは?
 モックにしては手順が面倒なのも。もとのOpenAPIの定義が変わったらどうする?
 
 こういうのがあるらしい。試す
 [stoplightio/prism: Turn any OpenAPI2/3 and Postman Collection file into an API server with mocking, transformations and validations.](https://github.com/stoplightio/prism)
+
+試した。なるほど手軽だ。レスポンスの正しさが不要で、クライアントのテストでいいなら、これでいいのかも。

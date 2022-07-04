@@ -145,7 +145,7 @@ resource "aws_iam_role" "hello" {
   ]
 }
 
-####
+#### API Gateway from OpenAPI specification
 
 data "template_file" "api" {
   template = file("./openapi.yaml")
