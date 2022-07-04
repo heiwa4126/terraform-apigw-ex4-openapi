@@ -125,3 +125,4 @@ contents/*
 variable*.tf
 src/*
 tmp/*
+openapi-rewrite.yaml
